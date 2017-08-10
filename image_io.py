@@ -24,3 +24,6 @@ def _read_raw(file, width, height):
         for k in range(len(text)):
             image[k // width][k % width] = ord(text[k])
     return image
+
+def save_image(image, path):
+    cv2.imwrite(path, image)
