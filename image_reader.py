@@ -13,11 +13,11 @@ sizes = {
 def read(file_path):
     file_name = file_path.split('/')[-1]
     if file_name in sizes:
-        return read_raw(file_path, sizes[file_name][0], sizes[file_name][1])
+        return _read_raw(file_path, sizes[file_name][0], sizes[file_name][1])
     else:
         return cv2.imread(file_path)
 
-def read_raw(file, width, height):
+def _read_raw(file, width, height):
     image = np.zeros((height, width, 1), np.uint8)
     with io.open(file, 'r', encoding='mac_roman') as f:
         text = f.read()
