@@ -17,6 +17,15 @@ def subtract_images(img1, img2):
 def multiply_images(img1, img2):
     return _apply_between_images(po.multiply, img1, img2)
 
+def multiply_by_scalar(img, scalar=1.5):
+    print('TODO')
+
+def compress_dynamic_range(img):
+    print('TODO')
+
+def apply_gamma_potential(img, gamma=2):
+    print('TODO')
+
 def negative(img):
     result = np.copy(img)
     return np.vectorize(lambda x: 255 - x)(result).astype(np.uint8)
