@@ -1,14 +1,21 @@
 import cv2
 import numpy as np
 
+import matplotlib as plt
+plt.use("TkAgg")
+import matplotlib.pyplot
+
+from basics import transforms as tr
+from basics import pixel_operations as po
+
 def add_images(img1, img2):
-    print('TODO')
+    return _apply_between_images(po.sum, img1, img2)
 
 def subtract_images(img1, img2):
-    print('TODO')
+    return _apply_between_images(po.subtract, img1, img2)
 
 def multiply_images(img1, img2):
-    print('TODO')
+    return _apply_between_images(po.multiply, img1, img2)
 
 def negative(img):
     result = np.copy(img)
@@ -18,8 +25,19 @@ def negative(img):
                 result[i,j,k] = 255 - img[i,j,k]
     return result
 
+# TODO: this func needs to be improved
 def grayscale_histogram(img):
-    print('TODO')
+    colorsCount = np.zeros(256)
+    width = len(img)
+    height = len(img[0])
+    for i in range(width):
+        for j in range(height):
+            for k in range(len(img[i,j])):
+                colorsCount[img[i,j,k]] = colorsCount[img[i,j,k]] + 1
+    for x in range(len(colorsCount)):
+        colorsCount[x] = colorsCount[x] / (width * height)
+        matplotlib.pyplot.bar(x, colorsCount[x], 1, color="#3292e1")
+    plt.pyplot.show()
 
 def increase_contrast(img):
     result = np.copy(img)
@@ -65,3 +83,18 @@ def random_exponential(lambda_):
 def ejercicio_9_para_adelante():
     print('TODO')
 
+def _apply_between_images(f, img1, img2):
+    width = max(len(img1), len(img2))
+    height = max(len(img1[0]), len(img2[0]))
+    result = np.zeros((width, height, 3), np.int32)
+    img1 = tr.complete_with_zeros(img1, width, height)
+    img2 = tr.complete_with_zeros(img2, width, height)
+    extremeValues = [0, 0]
+    for i in range(width):
+        for j in range(height):
+            for k in range(len(img1[i,j])):
+                result[i,j,k] = f(np.int32(img1[i,j,k]), np.int32(img2[i,j,k]))
+                extremeValues[1] = max(result[i,j,k], extremeValues[1])
+                extremeValues[0] = min(result[i,j,k], extremeValues[0])
+    result = tr.mapValues(result, extremeValues[0], extremeValues[1])
+    return result

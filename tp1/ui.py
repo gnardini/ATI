@@ -67,9 +67,11 @@ sub_btn = Button(root, text='Restar', command=lambda: put_into(resultPanelA, ops
 sub_btn.grid(row=0, column=1)
 mult_btn = Button(root, text='Multiplicar', command=lambda: put_into(resultPanelA, ops.multiply_images(original_image_a, original_image_b)))
 mult_btn.grid(row=0, column=2)
+mult_btn = Button(root, text='Histograma', command=lambda: ops.grayscale_histogram(original_image_a))
+mult_btn.grid(row=0, column=3)
 negative_btn = Button(root, text='Negativo', command=lambda: put_into(resultPanelA, ops.negative(original_image_a)))
-negative_btn.grid(row=0, column=3)
-negative_btn = Button(root, text='Contraste', command=lambda: put_into(resultPanelA, ops.increase_contrast(original_image_a)))
 negative_btn.grid(row=0, column=4)
+negative_btn = Button(root, text='Contraste', command=lambda: put_into(resultPanelA, ops.increase_contrast(original_image_a)))
+negative_btn.grid(row=0, column=5)
 
 root.mainloop()

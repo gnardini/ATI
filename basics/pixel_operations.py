@@ -1,0 +1,23 @@
+import numpy as np
+
+def map_dynamic_value(pixel, minValue, maxValue):
+    if (pixel < 0):
+        return minValue
+    c = round((minValue-1)/log(1+maxValue))
+    return c*log(1 + pixel)
+
+def map_value(pixel, minValue, maxValue):
+    range = (maxValue - minValue)
+    if (range == 0):
+        return 0
+    else:
+        return np.uint8((pixel - minValue) * 255 / range)
+
+def sum(pixel1, pixel2):
+    return pixel1 + pixel2
+
+def subtract(pixel1, pixel2):
+    return pixel1 - pixel2
+
+def multiply(pixel1, pixel2):
+    return pixel1 * pixel2
