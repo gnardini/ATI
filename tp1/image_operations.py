@@ -19,11 +19,7 @@ def multiply_images(img1, img2):
 
 def negative(img):
     result = np.copy(img)
-    for i in range(len(img)):
-        for j in range(len(img[i])):
-            for k in range(len(img[i,j])):
-                result[i,j,k] = 255 - img[i,j,k]
-    return result
+    return np.vectorize(lambda x: 255 - x)(result).astype(np.uint8)
 
 def grayscale_histogram(img, show_plot=True):
     colorsCount = np.zeros(256)
