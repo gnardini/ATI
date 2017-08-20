@@ -73,5 +73,7 @@ negative_btn = Button(root, text='Negativo', command=lambda: put_into(resultPane
 negative_btn.grid(row=0, column=4)
 negative_btn = Button(root, text='Contraste', command=lambda: put_into(resultPanelA, ops.increase_contrast(original_image_a)))
 negative_btn.grid(row=0, column=5)
+negative_btn = Button(root, text='Umbralización', command=lambda: put_into(resultPanelA, ops.apply_threshold(original_image_a, 150)))
+negative_btn.grid(row=0, column=6)
 
 root.mainloop()

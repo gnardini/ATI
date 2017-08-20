@@ -66,7 +66,12 @@ def increase_contrast(img):
     return result
 
 def apply_threshold(img, threshold):
-    print('TODO')
+    result = np.copy(img)
+    for i in range(len(img)):
+        for j in range(len(img[i])):
+            for k in range(len(img[i,j])):
+                result[i,j,k] = 0 if img[i,j,k] < threshold else 255
+    return result
 
 def equalize(img):
     print('TODO')
