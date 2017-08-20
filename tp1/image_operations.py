@@ -25,19 +25,20 @@ def negative(img):
                 result[i,j,k] = 255 - img[i,j,k]
     return result
 
-# TODO: this func needs to be improved
-def grayscale_histogram(img):
+def grayscale_histogram(img, show_plot=True):
     colorsCount = np.zeros(256)
     width = len(img)
     height = len(img[0])
     for i in range(width):
         for j in range(height):
             for k in range(len(img[i,j])):
-                colorsCount[img[i,j,k]] = colorsCount[img[i,j,k]] + 1
+                colorsCount[img[i,j,k]] += 1
     for x in range(len(colorsCount)):
-        colorsCount[x] = colorsCount[x] / (width * height)
+        colorsCount[x] /= (width * height * len(img[0,0]))
         matplotlib.pyplot.bar(x, colorsCount[x], 1, color="#3292e1")
-    plt.pyplot.show()
+    if show_plot:
+        plt.pyplot.show()
+    return colorsCount
 
 def increase_contrast(img):
     result = np.copy(img)

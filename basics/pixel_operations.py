@@ -9,7 +9,7 @@ def map_dynamic_value(pixel, minValue, maxValue):
 def map_value(pixel, minValue, maxValue):
     range = (maxValue - minValue)
     if (range == 0):
-        return 0
+        return pixel
     else:
         return np.uint8((pixel - minValue) * 255 / range)
 
