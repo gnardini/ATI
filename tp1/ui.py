@@ -72,7 +72,10 @@ btn = Button(root, text='Negativo', command=lambda: put_into(resultPanelA, ops.n
 btn.grid(row=0, column=4)
 btn = Button(root, text='Contraste', command=lambda: put_into(resultPanelA, ops.increase_contrast(original_image_a)))
 btn.grid(row=0, column=5)
-btn = Button(root, text='Umbralización', command=lambda: put_into(resultPanelA, ops.apply_threshold(original_image_a, 150)))
-btn.grid(row=0, column=6)
+scale = Scale(root, from_=0, to=255, orient=HORIZONTAL)
+scale.set(128)
+scale.grid(row=0, column=6)
+btn = Button(root, text='Umbralización', command=lambda: put_into(resultPanelA, ops.apply_threshold(original_image_a, scale.get())))
+btn.grid(row=1, column=6)
 
 root.mainloop()
