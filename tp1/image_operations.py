@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import math
 
 import matplotlib as plt
 plt.use("TkAgg")
@@ -80,16 +81,20 @@ def apply_threshold(img, threshold):
     return result
 
 def equalize(img):
+    hist = grayscale_histogram(img, False)
     print('TODO')
 
+# No creo que esto este bien
 def random_gauss(mean, stdv):
-    print('TODO')
+    y1 = math.sqrt(-2*math.log(mean-stdv))*math.cos(2*math.pi*(mean+stdv))
+    y2 = math.sqrt(-2 * math.log(mean - stdv)) * math.sin(2 * math.pi * (mean + stdv))
+    return (y1+y2)/2
 
-def random_rayleigh(epsilon):
-    print('TODO')
+def random_rayleigh(px, epsilon):
+    return epsilon*math.sqrt(-2*math.log(1-px))
 
-def random_exponential(lambda_):
-    print('TODO')
+def random_exponential(px, lambda_):
+    return (-1/lambda_)*math.log(px)
 
 def ejercicio_9_para_adelante():
     print('TODO')
