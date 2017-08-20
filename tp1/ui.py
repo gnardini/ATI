@@ -26,23 +26,34 @@ def select_image(targetPanel):
         return np.zeros(0)
     return img_array
 
-def put_into(panel, img):
-    img = to_tk_image(img)
-    panel.configure(image=img)
-    panel.image = img
-
 def assign_image_a():
     global original_image_a
+    global modify_image_a
     original_image_a = select_image(originalPanelA)
 
 def assign_image_b():
     global original_image_b
+    global modify_image_b
     original_image_b = select_image(originalPanelB)
+
+#TODO: fix this function
+def save_image():
+    path = filedialog.asksaveasfilename()
+    if path:
+        image_io.save_image(modify_image_a, path)
+
+def put_into(panel, img):
+    modify_image_a = img #TODO: this should be change for both
+    img = to_tk_image(img)
+    panel.configure(image=img)
+    panel.image = img
 
 root = Tk()
 
 original_image_a = None
 original_image_b = None
+modify_image_a = None
+modify_image_b = None
 
 # Imagenes y botones para agregarlas
 base_row = 2
@@ -77,5 +88,9 @@ scale.set(128)
 scale.grid(row=0, column=6)
 btn = Button(root, text='Umbralización', command=lambda: put_into(resultPanelA, ops.apply_threshold(original_image_a, scale.get())))
 btn.grid(row=1, column=6)
+btn = Button(root, text='Ecualización', command=lambda: put_into(resultPanelA, ops.equalize(original_image_a)))
+btn.grid(row=0, column=7)
+btn = Button(root, text='Guardar', command=lambda: save_image())
+btn.grid(row=0, column=8)
 
 root.mainloop()

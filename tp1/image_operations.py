@@ -37,10 +37,9 @@ def grayscale_histogram(img, show_plot=True):
     height = len(img[0])
     for i in range(width):
         for j in range(height):
-            for k in range(len(img[i,j])):
-                colorsCount[img[i,j,k]] += 1
+            colorsCount[img[i,j,0]] += 1
     for x in range(len(colorsCount)):
-        colorsCount[x] /= (width * height * len(img[0,0]))
+        colorsCount[x] /= (width * height)
         matplotlib.pyplot.bar(x, colorsCount[x], 1, color="#3292e1")
     if show_plot:
         plt.pyplot.show()
@@ -80,9 +79,17 @@ def apply_threshold(img, threshold):
                 result[i,j,k] = 0 if img[i,j,k] < threshold else 255
     return result
 
+# TODO: just in progress
 def equalize(img):
-    hist = grayscale_histogram(img, False)
-    print('TODO')
+    hist = _hist(img, len(img), len(img[0]))
+    cdf = _cdf(hist, len(img) * len(img[0]))
+    smin = _cdf_min(cdf)
+    result = np.copy(img)
+    for i in range(len(img)):
+        for j in range(len(img[i])):
+            for k in range(len(img[i,j])):
+                result[i,j,k] = round( (cdf[img[i,j,k], k] - smin[k]) / (1 - smin[k]) * 255 )
+    return result
 
 # No creo que esto este bien
 def random_gauss(mean, stdv):
@@ -114,3 +121,27 @@ def _apply_between_images(f, img1, img2):
                 extremeValues[0] = min(result[i,j,k], extremeValues[0])
     result = tr.mapValues(result, extremeValues[0], extremeValues[1])
     return result
+
+def _cdf(p, n):
+    result = np.copy(p)
+    # initialize
+    result[0] = p[0] / n
+    for x in range(len(p) - 1):
+        for y in range(len(p[0])):
+            result[x + 1, y] = p[x + 1, y] / n + result[x, y]
+    return result
+
+def _hist(img, width, height):
+    colorsCount = np.zeros((256, 3))
+    for i in range(width):
+        for j in range(height):
+            for k in range(len(img[i,j])):
+                colorsCount[img[i,j,k], k] = colorsCount[img[i,j,k], k] + 1
+    return colorsCount
+
+def _cdf_min(cdf):
+    minCdf = np.zeros(3)
+    for x in range(len(cdf)):
+        for y in range(len(cdf[0])):
+            minCdf[y] = min (minCdf[y], cdf[x, y])
+    return minCdf
