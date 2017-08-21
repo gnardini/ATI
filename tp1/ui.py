@@ -97,5 +97,6 @@ scale.set(128)
 scale.grid(row=0, column=3)
 btn = Button(root, text='Umbralización', command=lambda: put_into('result-up', ops.apply_threshold(images['original-up'], scale.get())))
 btn.grid(row=1, column=3)
-
+btn = Button(root, text='Filtro Gamma', command=lambda: put_into('result-up', ops.apply_gamma_potential(images['original-up'])))
+btn.grid(row=1, column=4)
 root.mainloop()

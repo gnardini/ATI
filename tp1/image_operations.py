@@ -41,8 +41,13 @@ def compress_dynamic_range(img):
                 extremeValues = max(result[i,j,k], extremeValues)
     return tr.mapDynamicRango(img, extremeValues)
 
-def apply_gamma_potential(img, gamma=2):
-    print('TODO')
+def apply_gamma_potential(img, gamma=0.5):
+    result = np.copy(img)
+    for i in range(len(img)):
+        for j in range(len(img[i])):
+            for k in range(len(img[i,j])):
+                result[i,j,k] = round(math.pow(255,(1-gamma))*math.pow(img[i,j,k], gamma))
+    return result
 
 def negative(img):
     result = np.copy(img)
