@@ -19,10 +19,27 @@ def multiply_images(img1, img2):
     return _apply_between_images(po.multiply, img1, img2)
 
 def multiply_by_scalar(img, scalar=1.5):
-    print('TODO')
+    width = len(img)
+    height = len(img[0])
+    result = np.zeros((width, height, 3), np.int32)
+    extremeValues = 0
+    for i in range(width):
+        for j in range(height):
+            for k in range(len(img[i,j])):
+                result[i,j,k] = np.int32(img[i,j,k]) * scalar
+                extremeValues = max(result[i,j,k], extremeValues)
+    print(extremeValues)
+    result = tr.mapDynamicRango(result, extremeValues)
+    return result
 
+#TODO: extract min and max to separate func and with different bands
 def compress_dynamic_range(img):
-    print('TODO')
+    extremeValues = 0
+    for i in range(width):
+        for j in range(height):
+            for k in range(len(img1[i,j])):
+                extremeValues = max(result[i,j,k], extremeValues)
+    return tr.mapDynamicRango(img, extremeValues)
 
 def apply_gamma_potential(img, gamma=2):
     print('TODO')
@@ -79,7 +96,7 @@ def apply_threshold(img, threshold):
                 result[i,j,k] = 0 if img[i,j,k] < threshold else 255
     return result
 
-# TODO: just in progress
+# TODO: arregalr estilo de esto.
 def equalize(img):
     hist = _hist(img, len(img), len(img[0]))
     cdf = _cdf(hist, len(img) * len(img[0]))
