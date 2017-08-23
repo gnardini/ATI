@@ -22,26 +22,27 @@ def multiply_by_scalar(img, scalar=1.5):
     width = len(img)
     height = len(img[0])
     result = np.zeros((width, height, 3), np.int32)
-    extremeValues = 0
+    extremeValue = 0
     for i in range(width):
         for j in range(height):
             for k in range(len(img[i,j])):
                 result[i,j,k] = np.int32(img[i,j,k]) * scalar
-                extremeValues = max(result[i,j,k], extremeValues)
-    print(extremeValues)
-    result = tr.mapDynamicRango(result, extremeValues)
+                extremeValue = max(result[i,j,k], extremeValue)
+    result = tr.mapDynamicRango(result, extremeValue)
     return result
 
 #TODO: extract min and max to separate func and with different bands
 def compress_dynamic_range(img):
-    extremeValues = 0
+    extremeValue = 0
+    width = len(img)
+    height = len(img[0])
     for i in range(width):
         for j in range(height):
-            for k in range(len(img1[i,j])):
-                extremeValues = max(result[i,j,k], extremeValues)
-    return tr.mapDynamicRango(img, extremeValues)
+            for k in range(len(img[i,j])):
+                extremeValue = max(result[i,j,k], extremeValue)
+    return tr.mapDynamicRango(img, extremeValue)
 
-def apply_gamma_potential(img, gamma=0.5):
+def apply_gamma_potential(img, gamma=2):
     result = np.copy(img)
     for i in range(len(img)):
         for j in range(len(img[i])):
