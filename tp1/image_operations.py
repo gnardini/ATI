@@ -4,10 +4,18 @@ import math
 
 import matplotlib as plt
 plt.use("TkAgg")
-import matplotlib.pyplot
+import matplotlib.pyplot as plt2
 
 from basics import transforms as tr
 from basics import pixel_operations as po
+
+def add_rayleigh_noise(img):
+    noise = np.random.rand(len(img), len(img[0]))
+    noise = np.vectorize(lambda x: random_rayleigh(x))(noise).astype(np.uint8)
+    result = np.copy(img)
+    for i in range(len(img[0,0])):
+        result[:,:,i] += noise
+    return result
 
 def add_images(img1, img2):
     return _apply_between_images(po.sum, img1, img2)
@@ -115,11 +123,14 @@ def equalize(img):
 
 # No creo que esto este bien
 def random_gauss(mean, stdv):
-    y1 = math.sqrt(-2*math.log(mean-stdv))*math.cos(2*math.pi*(mean+stdv))
-    y2 = math.sqrt(-2 * math.log(mean - stdv)) * math.sin(2 * math.pi * (mean + stdv))
-    return (y1+y2)/2
+    theta = 2*math.pi*np.random.random()
+    rho = math.sqrt(-2*math.log(1-np.random.random()))
+    scale = stdv*rho
+    x = mean + scale * math.cos(theta)
+    y = mean + scale * math.sin(theta)
+    return x, y
 
-def random_rayleigh(px, epsilon):
+def random_rayleigh(px, epsilon=1):
     return epsilon*math.sqrt(-2*math.log(1-px))
 
 def random_exponential(px, lambda_):
