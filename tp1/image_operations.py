@@ -9,14 +9,6 @@ import matplotlib.pyplot as plt2
 from basics import transforms as tr
 from basics import pixel_operations as po
 
-def add_rayleigh_noise(img):
-    noise = np.random.rand(len(img), len(img[0]))
-    noise = np.vectorize(lambda x: random_rayleigh(x))(noise).astype(np.uint8)
-    result = np.copy(img)
-    for i in range(len(img[0,0])):
-        result[:,:,i] += noise
-    return result
-
 def add_images(img1, img2):
     return _apply_between_images(po.sum, img1, img2)
 
@@ -122,23 +114,147 @@ def equalize(img):
                 result[i,j,k] = round( (cdf[img[i,j,k], k] - smin[k]) / (1 - smin[k]) * 255 )
     return result
 
-# No creo que esto este bien
-def random_gauss(mean, stdv):
-    theta = 2*math.pi*np.random.random()
-    rho = math.sqrt(-2*math.log(1-np.random.random()))
-    scale = stdv*rho
-    x = mean + scale * math.cos(theta)
-    y = mean + scale * math.sin(theta)
-    return x, y
+def add_gaussian_noise(img, percent=.2, mean=0, stdv=10):
+    total = len(img) * len(img[0])
+    noise = np.random.normal(mean, stdv, int(total * percent))
+    return _add_noise(img, noise, 'add')
 
-def random_rayleigh(px, epsilon=1):
-    return epsilon*math.sqrt(-2*math.log(1-px))
+def add_rayleigh_noise(img, percent=.2, scale=.5):
+    total = len(img) * len(img[0])
+    noise = np.random.rayleigh(scale, int(total * percent))
+    return _add_noise(img, noise, 'mult')
 
-def random_exponential(px, lambda_):
-    return (-1/lambda_)*math.log(px)
+def add_exponential_noise(img, percent=.2, _lambda=1):
+    total = len(img) * len(img[0])
+    noise = np.random.exponential(1/_lambda, int(total * percent))
+    return _add_noise(img, noise, 'mult')
 
-def ejercicio_9_para_adelante():
-    print('TODO')
+def add_salt_pepper_noise(img, percent=.2):
+    p0 = percent/2
+    p1 = 1-p0
+    result = np.copy(img)
+    transformed = np.vectorize(lambda x: transform_salt_pepper(x, p0, p1))(result[:,:,0]).astype(np.uint8)
+    for k in range(len(img[0,0])):
+        result[:,:,k] = transformed
+    return result
+
+def transform_salt_pepper(px, p0, p1):
+    r = np.random.random()
+    if r < p0:
+        return 0
+    elif r > p1:
+        return 255
+    else:
+        return px
+
+def _add_noise(img, noise, mode='add'):
+    total = len(img) * len(img[0])
+    zeros = np.zeros(total - len(noise))
+    if mode == 'mult':
+        zeros = np.ones(total - len(noise))
+    noise = np.concatenate((noise, zeros))
+    np.random.shuffle(noise)
+    noise = noise.reshape((len(img), len(img[0])))
+    result = np.copy(img).astype(np.float32)
+    for k in range(len(img[0, 0])):
+        if mode == 'add':
+            result[:, :, k] += noise
+        elif mode == 'mult':
+            result[:, :, k] *= noise
+    return np.vectorize(keep_in_range)(result).astype(np.uint8)
+
+def keep_in_range(px):
+    if px < 0:
+        return 0
+    elif px > 255:
+        return 255
+    else:
+        return px
+
+def apply_mean_filter(img, size=3):
+    if size%2 == 0:
+        print('Tiene que ser impar')
+        return img
+    filter = np.ones(size*size).reshape((size, size)) / (size*size)
+    to_border = int((size-1)/2)
+    result = img.copy()
+    for i in range(to_border, len(img)-to_border):
+        for j in range(to_border, len(img[0]) - to_border):
+            for k in range(len(img[0,0])):
+                new_px = 0
+                for x in range(-to_border, to_border+1):
+                    for y in range(-to_border, to_border+1):
+                        new_px += filter[x+to_border,y+to_border]*img[i+x, j+y, k]
+                result[i, j, k] = new_px
+    return result
+
+def apply_median_filter(img, size=3):
+    if size%2 == 0:
+        print('Tiene que ser impar')
+        return img
+    to_border = int((size-1)/2)
+    result = img.copy()
+    for i in range(to_border, len(img)-to_border):
+        for j in range(to_border, len(img[0]) - to_border):
+            for k in range(len(img[0,0])):
+                new_px = []
+                for x in range(-to_border, to_border+1):
+                    for y in range(-to_border, to_border+1):
+                        new_px.append(img[i+x, j+y, k])
+                new_px = np.sort(new_px)
+                result[i, j, k] = new_px[int((len(new_px)-1)/2)]
+    return result
+
+def apply_weighted_median_filter(img):
+    to_border = 1
+    filter = [[1,2,1], [2,4,2], [1,2,1]]
+    result = img.copy()
+    for i in range(to_border, len(img)-to_border):
+        for j in range(to_border, len(img[0]) - to_border):
+            for k in range(len(img[0,0])):
+                new_px = []
+                for x in range(-to_border, to_border+1):
+                    for y in range(-to_border, to_border+1):
+                        for _ in range(filter[x+to_border][y+to_border]):
+                            new_px.append(img[i+x, j+y, k])
+                new_px = np.sort(new_px)
+                result[i, j, k] = new_px[int((len(new_px)-1)/2)]
+    return result
+
+def apply_gauss_filter(img, sigma=1):
+    size = 2*sigma+1
+    filter = np.ones(size * size).reshape((size, size)) / (size * size)
+    to_border = int((size - 1) / 2)
+
+    for x in range(-to_border, to_border + 1):
+        for y in range(-to_border, to_border + 1):
+            filter[to_border+x][to_border+y] = (1/math.sqrt(2*math.pi*sigma*sigma))*math.exp(-(x*x+y*y)/(sigma*sigma))
+    filter /= np.sum(filter)
+
+    result = img.copy()
+    for i in range(to_border, len(img) - to_border):
+        for j in range(to_border, len(img[0]) - to_border):
+            for k in range(len(img[0, 0])):
+                new_px = 0
+                for x in range(-to_border, to_border + 1):
+                    for y in range(-to_border, to_border + 1):
+                        new_px += filter[x + to_border, y + to_border] * img[i + x, j + y, k]
+                result[i, j, k] = new_px
+    return result
+
+def apply_pasaalto_filter(img):
+    to_border = 1
+    filter = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]]) / 9
+    result = img.copy()
+    for i in range(to_border, len(img) - to_border):
+        for j in range(to_border, len(img[0]) - to_border):
+            for k in range(len(img[0, 0])):
+                new_px = 0
+                for x in range(-to_border, to_border + 1):
+                    for y in range(-to_border, to_border + 1):
+                        new_px += filter[x + to_border, y + to_border] * img[i + x, j + y, k]
+                result[i, j, k] = new_px
+    return result
 
 def _apply_between_images(f, img1, img2):
     width = max(len(img1), len(img2))

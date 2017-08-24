@@ -57,7 +57,7 @@ images = {
 }
 
 # Imagenes y botones para agregarlas
-base_row = 2
+base_row = 4
 panels['original-up'] = Label(root)
 panels['original-up'].grid(row=base_row, column=0, columnspan=3)
 panels['result-up'] = Label(root)
@@ -99,7 +99,30 @@ btn = Button(root, text='Umbralización', command=lambda: put_into('result-up', 
 btn.grid(row=1, column=3)
 btn = Button(root, text='Filtro Gamma', command=lambda: put_into('result-up', ops.apply_gamma_potential(images['original-up'])))
 btn.grid(row=1, column=4)
+gaussScale = Scale(root, from_=0, to=1, resolution=0.01, orient=HORIZONTAL)
+gaussScale.set(.2)
+gaussScale.grid(row=2, column=0)
+btn = Button(root, text='Gauss', command=lambda: put_into('result-up', ops.add_gaussian_noise(images['original-up'], gaussScale.get())))
+btn.grid(row=2, column=1)
+btn = Button(root, text='Exponencial', command=lambda: put_into('result-up', ops.add_exponential_noise(images['original-up'], gaussScale.get())))
+btn.grid(row=2, column=2)
 btn = Button(root, text='Rayleigh', command=lambda: put_into('result-up', ops.add_rayleigh_noise(images['original-up'])))
-btn.grid(row=0, column=5)
+btn.grid(row=2, column=3)
+btn = Button(root, text='Sal y Pimienta', command=lambda: put_into('result-up', ops.add_salt_pepper_noise(images['original-up'])))
+btn.grid(row=2, column=4)
+filterScale = Scale(root, from_=3, to=15, orient=HORIZONTAL)
+filterScale.set(5)
+filterScale.grid(row=3, column=0)
+btn = Button(root, text='Filtro media', command=lambda: put_into('result-up', ops.apply_mean_filter(images['original-up'], filterScale.get())))
+btn.grid(row=3, column=1)
+btn = Button(root, text='Filtro mediana', command=lambda: put_into('result-up', ops.apply_median_filter(images['original-up'], filterScale.get())))
+btn.grid(row=3, column=2)
+btn = Button(root, text='Filtro mediana ponderado', command=lambda: put_into('result-up', ops.apply_weighted_median_filter(images['original-up'])))
+btn.grid(row=3, column=3)
+btn = Button(root, text='Filtro Gauss', command=lambda: put_into('result-up', ops.apply_gauss_filter(images['original-up'])))
+btn.grid(row=3, column=4)
+btn = Button(root, text='Filtro pasaalto', command=lambda: put_into('result-up', ops.apply_pasaalto_filter(images['original-up'])))
+btn.grid(row=3, column=5)
+
 root.mainloop()
 
