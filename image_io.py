@@ -19,12 +19,12 @@ def read(file_path, grayscale=False):
 
 def _read_raw(file, width, height):
     image = np.zeros((height, width, 3), np.uint8)
-    with io.open(file, 'r', encoding='mac_roman') as f:
+    with io.open(file, 'rb') as f:
         text = f.read()
         for k in range(len(text)):
-            image[k // width][k % width][0] = ord(text[k])
-            image[k // width][k % width][1] = ord(text[k])
-            image[k // width][k % width][2] = ord(text[k])
+            image[k // width][k % width][0] = text[k]
+            image[k // width][k % width][1] = text[k]
+            image[k // width][k % width][2] = text[k]
     return image
 
 def _read_img(file, grayscale):
