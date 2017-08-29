@@ -63,7 +63,7 @@ def grayscale_histogram(img, show_plot=True):
             colorsCount[img[i,j,0]] += 1
     for x in range(len(colorsCount)):
         colorsCount[x] /= (width * height)
-        matplotlib.pyplot.bar(x, colorsCount[x], 1, color="#3292e1")
+        plt.pyplot.bar(x, colorsCount[x], 1, color="#3292e1")
     if show_plot:
         plt.pyplot.show()
     return colorsCount
@@ -122,7 +122,6 @@ def add_gaussian_noise(img, percent=.2, mean=0, stdv=10):
 def add_rayleigh_noise(img, percent=.2, scale=.5):
     total = len(img) * len(img[0])
     noise = np.random.rayleigh(scale, int(total * percent))
-    noise = np.sort(noise)
     return _add_noise(img, noise, 'mult')
 
 def add_exponential_noise(img, percent=.2, _lambda=1):
