@@ -4,7 +4,7 @@ import math
 
 import matplotlib as plt
 plt.use("TkAgg")
-import matplotlib.pyplot as plt2
+import matplotlib.pyplot
 
 from basics import transforms as tr
 from basics import pixel_operations as po
@@ -122,6 +122,7 @@ def add_gaussian_noise(img, percent=.2, mean=0, stdv=10):
 def add_rayleigh_noise(img, percent=.2, scale=.5):
     total = len(img) * len(img[0])
     noise = np.random.rayleigh(scale, int(total * percent))
+    noise = np.sort(noise)
     return _add_noise(img, noise, 'mult')
 
 def add_exponential_noise(img, percent=.2, _lambda=1):
@@ -161,15 +162,7 @@ def _add_noise(img, noise, mode='add'):
             result[:, :, k] += noise
         elif mode == 'mult':
             result[:, :, k] *= noise
-    return np.vectorize(keep_in_range)(result).astype(np.uint8)
-
-def keep_in_range(px):
-    if px < 0:
-        return 0
-    elif px > 255:
-        return 255
-    else:
-        return px
+    return tr.mapValues(result, np.min(result), np.max(result))
 
 def apply_mean_filter(img, size=3):
     if size%2 == 0:
