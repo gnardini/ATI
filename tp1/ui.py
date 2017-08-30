@@ -7,6 +7,7 @@ import numpy as np
 import image_io
 
 from tp1 import image_operations as ops
+from basics import transforms as tr
 
 def to_tk_image(img):
     return ImageTk.PhotoImage(Image.fromarray(img))
@@ -35,8 +36,12 @@ def save_image(key):
     if path:
         image_io.save_image(images[key], path)
 
-def put_into(key, img):
+def put_into(key, img, mapping = tr.mapping.LINEAR):
     images[key] = img
+    if mapping == tr.mapping.LINEAR:
+        img = tr.mapValues(img)
+    else:
+        img = tr.mapDynamicRango(img)
     img = to_tk_image(img)
     panels[key].configure(image=img)
     panels[key].image = img
@@ -109,7 +114,7 @@ gaussScale.set(.2)
 gaussScale.grid(row=2, column=0)
 btn = Button(root, text='Gauss', command=lambda: put_into('result-up', ops.add_gaussian_noise(images['original-up'], gaussScale.get())))
 btn.grid(row=2, column=1)
-btn = Button(root, text='Exponencial', command=lambda: put_into('result-up', ops.add_exponential_noise(images['original-up'], gaussScale.get())))
+btn = Button(root, text='Exponencial', command=lambda: put_into('result-up', ops.add_exponential_noise(images['original-up'], gaussScale.get()), tr.mapping.DYNAMIC))
 btn.grid(row=2, column=2)
 btn = Button(root, text='Rayleigh', command=lambda: put_into('result-up', ops.add_rayleigh_noise(images['original-up'], gaussScale.get())))
 btn.grid(row=2, column=3)

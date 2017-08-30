@@ -1,7 +1,7 @@
 import numpy as np
 
 def map_dynamic_value(pixel, const):
-    if (pixel == 0):
+    if (pixel <= 0):
         return np.uint8(pixel)
     return np.uint8(const*np.log(1 + pixel))
 

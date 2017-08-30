@@ -28,7 +28,7 @@ def multiply_by_scalar(img, scalar=1.5):
             for k in range(len(img[i,j])):
                 result[i,j,k] = np.int32(img[i,j,k]) * scalar
                 extremeValue = max(result[i,j,k], extremeValue)
-    result = tr.mapDynamicRango(result, extremeValue)
+    #result = tr.mapDynamicRango(result, extremeValue)
     return result
 
 #TODO: extract min and max to separate func and with different bands
@@ -56,6 +56,8 @@ def negative(img):
 
 def grayscale_histogram(img, show_plot=True):
     colorsCount = np.zeros(256)
+    # only to show histogram
+    img = tr.mapValues(img)
     width = len(img)
     height = len(img[0])
     for i in range(width):
@@ -104,6 +106,8 @@ def apply_threshold(img, threshold):
 
 # TODO: arregalr estilo de esto.
 def equalize(img):
+    # only to show histogram
+    img = tr.mapValues(img)
     hist = _hist(img, len(img), len(img[0]))
     cdf = _cdf(hist, len(img) * len(img[0]))
     smin = _cdf_min(cdf)
@@ -161,7 +165,8 @@ def _add_noise(img, noise, mode='add'):
             result[:, :, k] += noise
         elif mode == 'mult':
             result[:, :, k] *= noise
-    return tr.mapValues(result, np.min(result), np.max(result))
+    #return tr.mapValues(result, np.min(result), np.max(result))
+    return result
 
 def apply_mean_filter(img, size=3):
     if size%2 == 0:
@@ -261,7 +266,7 @@ def _apply_between_images(f, img1, img2):
                 result[i,j,k] = f(np.int32(img1[i,j,k]), np.int32(img2[i,j,k]))
                 extremeValues[1] = max(result[i,j,k], extremeValues[1])
                 extremeValues[0] = min(result[i,j,k], extremeValues[0])
-    result = tr.mapValues(result, extremeValues[0], extremeValues[1])
+    #result = tr.mapValues(result, extremeValues[0], extremeValues[1])
     return result
 
 def _cdf(p, n):
@@ -275,6 +280,7 @@ def _cdf(p, n):
 
 def _hist(img, width, height):
     colorsCount = np.zeros((256, 3))
+    img = tr.mapValues(img)
     for i in range(width):
         for j in range(height):
             for k in range(len(img[i,j])):
