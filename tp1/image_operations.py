@@ -83,12 +83,24 @@ def increase_contrast(img):
             r2 = mean + (255 - mean) // 2
         else:
             r2 = mean + std
+
+        if r1 - std < 0:
+            s1 = r1 // 2
+        else:
+            s1 = r1 - std
+        if r2 + std > 255:
+            s2 = r2 + (255 - r2) // 2
+        else:
+            s2 = r2 + std
+
+        m = (255-s2) / (255-r2)
+        b = s2 - m * r2
         for i in range(len(matrix)):
             for j in range(len(matrix[i])):
                 if matrix[i,j] < r1:
-                    result[i,j,k] = matrix[i][j] // 2
+                    result[i,j,k] = matrix[i][j] * (s1/r1)
                 elif matrix[i,j] > r2:
-                    result[i, j, k] = matrix[i,j] + (255 - matrix[i,j]) // 2
+                    result[i, j, k] = matrix[i,j] * m + b
                 else:
                     result[i,j,k] = matrix[i,j]
 
