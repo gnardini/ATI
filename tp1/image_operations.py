@@ -260,6 +260,19 @@ def apply_pasaalto_filter(img):
                 result[i, j, k] = new_px
     return result
 
+def apply_mask(img, mask):
+    to_border = int((len(mask) - 1) / 2)
+    result = np.zeros(img.shape)
+    for i in range(to_border, len(img) - to_border):
+        for j in range(to_border, len(img[0]) - to_border):
+            for k in range(len(img[0, 0])):
+                new_px = 0
+                for x in range(-to_border, to_border + 1):
+                    for y in range(-to_border, to_border + 1):
+                        new_px += mask[x + to_border, y + to_border] * img[i + x, j + y, k]
+                result[i, j, k] = new_px
+    return result
+
 def _apply_between_images(f, img1, img2):
     width = max(len(img1), len(img2))
     height = max(len(img1[0]), len(img2[0]))

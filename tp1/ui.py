@@ -7,6 +7,7 @@ import numpy as np
 import image_io
 
 from tp1 import image_operations as ops
+from tp1 import border_detection as bd
 
 def to_tk_image(img):
     return ImageTk.PhotoImage(Image.fromarray(img))
@@ -57,7 +58,7 @@ images = {
 }
 
 # Imagenes y botones para agregarlas
-base_row = 4
+base_row = 5
 panels['original-up'] = Label(root)
 panels['original-up'].grid(row=base_row, column=0, columnspan=3)
 panels['result-up'] = Label(root)
@@ -131,6 +132,8 @@ btn.grid(row=3, column=3)
 btn = Button(root, text='Filtro Gauss', command=lambda: put_into('result-up', ops.apply_gauss_filter(images['original-up'])))
 btn.grid(row=3, column=4)
 btn = Button(root, text='Filtro pasaalto', command=lambda: put_into('result-up', ops.apply_pasaalto_filter(images['original-up'])))
-btn.grid(row=3, column=5)
+btn.grid(row=3, column=5)ops.apply_pasaalto_filter
+btn = Button(root, text='Sobel', command=lambda: put_into('result-up', bd.sobel(images['original-up'])))
+btn.grid(row=4, column=0)
 
 root.mainloop()
