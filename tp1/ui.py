@@ -58,7 +58,7 @@ images = {
 }
 
 # Imagenes y botones para agregarlas
-base_row = 5
+base_row = 6
 panels['original-up'] = Label(root)
 panels['original-up'].grid(row=base_row, column=0, columnspan=3)
 panels['result-up'] = Label(root)
@@ -132,8 +132,22 @@ btn.grid(row=3, column=3)
 btn = Button(root, text='Filtro Gauss', command=lambda: put_into('result-up', ops.apply_gauss_filter(images['original-up'])))
 btn.grid(row=3, column=4)
 btn = Button(root, text='Filtro pasaalto', command=lambda: put_into('result-up', ops.apply_pasaalto_filter(images['original-up'])))
-btn.grid(row=3, column=5)ops.apply_pasaalto_filter
-btn = Button(root, text='Sobel', command=lambda: put_into('result-up', bd.sobel(images['original-up'])))
+btn.grid(row=3, column=5)
+btn = Button(root, text='Prewitt', command=lambda: put_into('result-up', bd.prewitt(images['original-up'])))
 btn.grid(row=4, column=0)
+btn = Button(root, text='Sobel', command=lambda: put_into('result-up', bd.sobel(images['original-up'])))
+btn.grid(row=4, column=1)
+btn = Button(root, text='Laplaciano', command=lambda: put_into('result-up', bd.laplace(images['original-up'])))
+btn.grid(row=4, column=2)
+laplaceScale = Scale(root, from_=0, to=255, orient=HORIZONTAL)
+laplaceScale.set(128)
+laplaceScale.grid(row=4, column=3)
+btn = Button(root, text='Laplaciano pendiente', command=lambda: put_into('result-up', bd.laplace_pendiente(images['original-up'], laplaceScale.get())))
+btn.grid(row=4, column=4)
+sigmaScale = Scale(root, from_=1, to=11, orient=HORIZONTAL)
+sigmaScale.set(1)
+sigmaScale.grid(row=5, column=0)
+btn = Button(root, text='Laplaciano gauss', command=lambda: put_into('result-up', bd.laplace_gauss(images['original-up'], sigmaScale.get(), laplaceScale.get())))
+btn.grid(row=5, column=1)
 
 root.mainloop()

@@ -15,7 +15,7 @@ def read(file_path, grayscale=False):
     if file_name in sizes:
         return _read_raw(file_path, sizes[file_name][0], sizes[file_name][1])
     else:
-        return cv2.imread(file_path)
+        return np.roll(cv2.imread(file_path), 1, axis=-1)
 
 def _read_raw(file, width, height):
     image = np.zeros((height, width, 3), np.uint8)
