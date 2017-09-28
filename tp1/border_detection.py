@@ -15,6 +15,22 @@ def _apply_mask(img, vertical_mask, horizontal_mask):
                 result[i, j, k] = math.sqrt(v * v + h * h)
     return tr.mapValues(result, np.min(result), np.max(result))
 
+def _apply_masks(img, vertical_mask, horizontal_mask, up_left_mask, up_right_mask):
+    vertical = ops.apply_mask(img, vertical_mask)
+    horizontal = ops.apply_mask(img, horizontal_mask)
+    up_left = ops.apply_mask(img, up_left_mask)
+    up_right = ops.apply_mask(img, up_right_mask)
+    result = np.zeros(img.shape)
+    for i in range(0, len(img)):
+        for j in range(0, len(img[0])):
+            for k in range(len(img[0, 0])):
+                v1 = int(vertical[i, j, k])
+                v2 = int(horizontal[i, j, k])
+                v3 = int(up_left[i, j, k])
+                v4 = int(up_right[i, j, k])
+                result[i, j, k] = max([v1, v2, v3, v4])
+    return tr.mapValues(result, np.min(result), np.max(result))
+
 def prewitt(img):
     return _apply_mask(img,
                        np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]]),
@@ -24,6 +40,20 @@ def sobel(img):
     return _apply_mask(img,
                        np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]]),
                        np.array([[-1,0,1], [-2,0,2], [-1,0,1]]))
+
+def directional_prewitt(img):
+    return _apply_masks(img,
+                        np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]]),
+                        np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]]),
+                        np.array([[-1, -1, 0], [-1, 0, 1], [0, 1, 1]]),
+                        np.array([[0, -1, -1], [1, 0, -1], [1, 1, 0]]))
+
+def directional_sobel(img):
+    return _apply_masks(img,
+                        np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]]),
+                        np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]),
+                        np.array([[-2, -1, 0], [-1, 0, 1], [0, 1, 2]]),
+                        np.array([[0, -1, -2], [1, 0, -1], [2, 1, 0]]))
 
 def laplace(img):
     mask = np.array([[0, -1, 0], [-1, 4, -1], [0, -1, 0]])
