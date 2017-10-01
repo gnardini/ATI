@@ -133,4 +133,3 @@ def laplace_gauss(img, sigma=1, threshold=128):
                     result[i, j, k] = abs(v+prev)
     img = tr.mapValues(result, np.min(result), np.max(result))
     return ops.apply_threshold(img, threshold)
-    # return tr.mapValues(result, np.min(result), np.max(result))
