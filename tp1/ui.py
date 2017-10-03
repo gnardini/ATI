@@ -8,6 +8,7 @@ import image_io
 
 from tp1 import image_operations as ops
 from tp1 import border_detection as bd
+from tp1 import umbralization as umb
 
 def to_tk_image(img):
     return ImageTk.PhotoImage(Image.fromarray(img))
@@ -58,7 +59,7 @@ images = {
 }
 
 # Imagenes y botones para agregarlas
-base_row = 6
+base_row = 7
 panels['original-up'] = Label(root)
 panels['original-up'].grid(row=base_row, column=0, columnspan=3)
 panels['result-up'] = Label(root)
@@ -153,5 +154,12 @@ sigmaScale.set(1)
 sigmaScale.grid(row=5, column=3)
 btn = Button(root, text='Laplaciano gauss', command=lambda: put_into('result-up', bd.laplace_gauss(images['original-up'], sigmaScale.get(), laplaceScale.get())))
 btn.grid(row=5, column=4)
+deltaTScale = Scale(root, from_=1, to=15, orient=HORIZONTAL)
+deltaTScale.set(3)
+deltaTScale.grid(row=6, column=0)
+btn = Button(root, text='Umbralización global', command=lambda: put_into('result-up', umb.global_thresholding(images['original-up'], deltaTScale.get())))
+btn.grid(row=6, column=1)
+btn = Button(root, text='Otsu', command=lambda: put_into('result-up', umb.otsu(images['original-up'])))
+btn.grid(row=6, column=2)
 
 root.mainloop()
