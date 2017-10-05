@@ -9,6 +9,7 @@ import image_io
 from tp1 import image_operations as ops
 from tp1 import border_detection as bd
 from tp1 import umbralization as umb
+from tp1 import diffusion as diff
 
 def to_tk_image(img):
     return ImageTk.PhotoImage(Image.fromarray(img))
@@ -59,7 +60,7 @@ images = {
 }
 
 # Imagenes y botones para agregarlas
-base_row = 7
+base_row = 8
 panels['original-up'] = Label(root)
 panels['original-up'].grid(row=base_row, column=0, columnspan=3)
 panels['result-up'] = Label(root)
@@ -161,5 +162,15 @@ btn = Button(root, text='Umbralización global', command=lambda: put_into('resul
 btn.grid(row=6, column=1)
 btn = Button(root, text='Otsu', command=lambda: put_into('result-up', umb.otsu(images['original-up'])))
 btn.grid(row=6, column=2)
+tScale = Scale(root, from_=1, to=5, orient=HORIZONTAL)
+tScale.set(3)
+tScale.grid(row=7, column=0)
+sigScale = Scale(root, from_=1, to=5, orient=HORIZONTAL)
+sigScale.set(3)
+sigScale.grid(row=7, column=1)
+btn = Button(root, text='Difusion Isotropica', command=lambda: put_into('result-up', diff.isotropic_diffusion(images['original-up'], tScale.get())))
+btn.grid(row=7, column=2)
+btn = Button(root, text='Difusion Anisotropica', command=lambda: put_into('result-up', diff.anisotropic_diffusion(images['original-up'], tScale.get(), sigScale.get())))
+btn.grid(row=7, column=3)
 
 root.mainloop()

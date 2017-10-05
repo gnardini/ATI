@@ -12,7 +12,7 @@ def _apply_mask(img, vertical_mask, horizontal_mask):
             for k in range(len(img[0, 0])):
                 v = int(vertical[i, j, k])
                 h = int(horizontal[i, j, k])
-                result[i, j, k] = math.sqrt(v * v + h * h)
+                result[i, j, k] = math.sqrt(math.pow(v, 2) + math.pow(h, 2))
     return tr.mapValues(result, np.min(result), np.max(result))
 
 def _apply_masks(img, vertical_mask, horizontal_mask, up_left_mask, up_right_mask):
