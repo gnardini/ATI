@@ -29,26 +29,19 @@ def global_thresholding(img, delta_t=3):
     return th
 
 def otsu(img):
-    hist = ops._hist(img, len(img), len(img[0]))
-    total = len(img) * len(img[0])
-    current_max, threshold = 0, 0
-    mg, sumF, sumB = 0, 0, 0
+    p = ops.grayscale_histogram(img, False)
+    acum = np.cumsum(p)
+    means = np.zeros(256)
+    for i in range(1, 256):
+        means[i] = means[i-1] + p[i] * i
+    mg = means[255]
     variances = np.zeros(256)
-    for i in range(0,256):
-        mg += i * hist[i][0]
-    weightB, weightF = 0, 0
-    meanB, meanF = 0, 0
-    for i in range(0,256):
-        weightB += hist[i][0]
-        weightF = total - weightB
-        if weightF == 0:
-            break
-        sumB += i*hist[i][0]
-        sumF = mg - sumB
-        meanB = sumB/weightB
-        meanF = sumF/weightF
-        variances[i] = weightB * weightF
-        variances[i] *= (meanB-meanF)*(meanB-meanF)
+    for i in range(256):
+        den = acum[i] * (1 - acum[i])
+        if den == 0:
+            continue
+        num = (mg * acum[i] - means[i]) ** 2
+        variances[i] =  num / den
     threshold = np.argmax(variances)
-    print(threshold)
+    print (threshold)
     return ops.apply_threshold(img, threshold)
