@@ -29,24 +29,31 @@ def global_thresholding(img, delta_t=3):
     return th
 
 def otsu(img):
-    hist = ops.grayscale_histogram(img, False)
-    acum = np.cumsum(hist)
-    means = np.zeros(256)
-    for i in range(1, 256):
-        means[i] = means[i-1] + acum[i] * i
-    mg = means[255]
-    variances = np.zeros(256)
-    for i in range(256):
-        m1 = means[i] / acum[i]
-        m2 = (mg - means[i]) / (1 - acum[i])
-        vari = acum[i] * (1 - acum[i])
-        vari *= (m1-m2)**2
-        print(i, m1, m2, acum[i] * (1 - acum[i]), (m1-m2)**2)
-        variances[i] = vari
-        # mF = (mg - means[i]) / (1 - acum[i])
-        # variances[i] = (means[i] / acum[i] - mF) ** 2 * (acum[i] * (1 - acum[i]))
-        # variances[i] = (mg * acum[i] - means[i])**2 * (acum[i] * (1 - acum[i]))
-    print(variances)
-    threshold = np.argmax(variances)
-    print(np.argmax(variances))
+    width = len(img)
+    height = len(img[0])
+    hist = ops._hist(img, len(img), len(img[0]))
+    cdf = ops._cdf(hist, len(img) * len(img[0]))
+    print(cdf)
+    total = width * height
+    current_max, threshold = 0, 0
+    sumT, sumF, sumB = 0, 0, 0
+    for i in range(0,256):
+        sumT += i * hist[i][0]
+        weightB, weightF = 0, 0
+        varBetween, meanB, meanF = 0, 0, 0
+    for i in range(0,256):
+        weightB += hist[i][0]
+        weightF = total - weightB
+        if weightF == 0:
+            break
+        sumB += i*hist[i][0]
+        sumF = sumT - sumB
+        meanB = sumB/weightB
+        meanF = sumF/weightF
+        varBetween = weightB * weightF
+        varBetween *= (meanB-meanF)*(meanB-meanF)
+        if varBetween > current_max:
+            current_max = varBetween
+            threshold = i
+    print (threshold)
     return ops.apply_threshold(img, threshold)
