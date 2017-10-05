@@ -31,7 +31,7 @@ def leclerc(gradient, sigma):
 def lorentz(gradient, sigma):
     return 1 / (1 + math.pow(gradient, 2) / math.pow(sigma, 2))
 
-def anisotropic_diffusion(img, t, sigma):
+def anisotropic_diffusion(img, t, sigma, function):
     while t > 0:
         result = np.zeros(img.shape)
         for i in range(1, len(img)-1):
@@ -44,8 +44,10 @@ def anisotropic_diffusion(img, t, sigma):
                         img[i, j + 1, k] - img[i, j, k], # E
                         img[i, j - 1, k] - img[i, j, k] # O
                     ]
-                    g = [gradient * leclerc(gradient, sigma) for gradient in gradients]
-                    # g = [gradient * lorentz(gradient, sigma) for gradient in gradients]
+                    if function == 1:
+                        g = [gradient * leclerc(gradient, sigma) for gradient in gradients]
+                    else:
+                        g = [gradient * lorentz(gradient, sigma) for gradient in gradients]
                     new_px += np.sum(g) * .25
                     result[i,j,k] = new_px
         img = result
