@@ -30,17 +30,25 @@ def global_thresholding(img, delta_t=3):
 
 def otsu(img):
     hist = ops._hist(img, len(img), len(img[0]))
-    acum = ops._cdf(hist, len(img) * len(img[0]))
-    means = np.zeros(256)
-    for i in range(1, 256):
-        means[i] = means[i-1] + acum[i][0] * i
-    mg = means[255]
+    total = len(img) * len(img[0])
+    current_max, threshold = 0, 0
+    mg, sumF, sumB = 0, 0, 0
     variances = np.zeros(256)
-    for i in range(256):
-        mF = (mg - means[i]) / (1 - acum[i][0])
-        variances[i] = (means[i] / acum[i][0] - mF) ** 2 * (acum[i][0] * (1 - acum[i][0]))
-        variances[i] = (mg * acum[i][0] - means[i])**2 * (acum[i][0] * (1 - acum[i][0]))
-    print(variances)
+    for i in range(0,256):
+        mg += i * hist[i][0]
+    weightB, weightF = 0, 0
+    meanB, meanF = 0, 0
+    for i in range(0,256):
+        weightB += hist[i][0]
+        weightF = total - weightB
+        if weightF == 0:
+            break
+        sumB += i*hist[i][0]
+        sumF = mg - sumB
+        meanB = sumB/weightB
+        meanF = sumF/weightF
+        variances[i] = weightB * weightF
+        variances[i] *= (meanB-meanF)*(meanB-meanF)
     threshold = np.argmax(variances)
-    print(np.argmax(variances))
+    print(threshold)
     return ops.apply_threshold(img, threshold)
