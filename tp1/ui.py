@@ -175,5 +175,7 @@ btn.grid(row=7, column=3)
 funcSel = Scale(root, from_=1, to=2, orient=HORIZONTAL)
 funcSel.set(1)
 funcSel.grid(row=7, column=4)
+btn = Button(root, text='Canny', command=lambda: put_into('result-up', bd.canny_detector(images['original-up'])))
+btn.grid(row=7, column=5)
 
 root.mainloop()
