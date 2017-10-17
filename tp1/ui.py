@@ -60,7 +60,7 @@ images = {
 }
 
 # Imagenes y botones para agregarlas
-base_row = 8
+base_row = 9
 panels['original-up'] = Label(root)
 panels['original-up'].grid(row=base_row, column=0, columnspan=3)
 panels['result-up'] = Label(root)
@@ -176,6 +176,8 @@ funcSel = Scale(root, from_=1, to=2, orient=HORIZONTAL)
 funcSel.set(1)
 funcSel.grid(row=7, column=4)
 btn = Button(root, text='Canny', command=lambda: put_into('result-up', bd.canny_detector(images['original-up'])))
-btn.grid(row=7, column=5)
+btn.grid(row=8, column=0)
+btn = Button(root, text='SUSAN', command=lambda: put_into('result-up', bd.susan(images['original-up'])))
+btn.grid(row=8, column=1)
 
 root.mainloop()

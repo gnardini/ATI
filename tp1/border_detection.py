@@ -197,3 +197,33 @@ def canny_detector(img, sig1=1, sig2=3, sig3=10):
                 else:
                     result[i, j, k] = 0
     return result
+
+def susan(img):
+    mask = [
+        [0, 0, 1, 1, 1, 0, 0],
+        [0, 1, 1, 1, 1, 1, 0],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1],
+        [0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 1, 1, 1, 0, 0],
+    ]
+    t = 27
+    rounding_tolerance = .05
+    to_border = int((len(mask) - 1) / 2)
+    result = np.zeros_like(img)
+    for i in range(to_border, len(img) - to_border):
+        for j in range(to_border, len(img[0]) - to_border):
+            for k in range(len(img[0, 0])):
+                similar = 0
+                for x in range(-to_border, to_border + 1):
+                    for y in range(-to_border, to_border + 1):
+                        if mask[x + to_border][y + to_border] == 1:
+                            if abs(int(img[i,j,k])-img[i+x, j+y, k]) >= t:
+                                similar += 1
+                s = 1 - (similar / 37)
+                if s > .5-rounding_tolerance and s < .5+rounding_tolerance:
+                    result[i, j] = [255, 255, 255]
+                elif s > .75-rounding_tolerance and s < .75+rounding_tolerance:
+                    result[i, j] = [0, 255, 0]
+    return result
