@@ -179,5 +179,7 @@ btn = Button(root, text='Canny', command=lambda: put_into('result-up', bd.canny_
 btn.grid(row=8, column=0)
 btn = Button(root, text='SUSAN', command=lambda: put_into('result-up', bd.susan(images['original-up'])))
 btn.grid(row=8, column=1)
+btn = Button(root, text='Hough', command=lambda: put_into('result-up', bd.hough_transform(images['original-up'])))
+btn.grid(row=8, column=2)
 
 root.mainloop()

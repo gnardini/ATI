@@ -227,3 +227,75 @@ def susan(img):
                 elif s > .75-rounding_tolerance and s < .75+rounding_tolerance:
                     result[i, j] = [0, 255, 0]
     return result
+
+def _find_white_points(img):
+    points = []
+    for i in range(0, len(img)):
+        for j in range(0, len(img[0])):
+            if img[i, j, 0] == 255:
+                points.append((i, j))
+    return points
+
+def _satisfies_line_normal_equation(x, y, tita, ro, epsilon):
+    return abs(ro - x * math.cos(tita) - y * math.sin(tita)) < epsilon
+
+def _draw_line(img, tita, ro, epsilon):
+    for i in range(0, len(img)):
+        for j in range(0, len(img[0])):
+            if _satisfies_line_normal_equation(i, j, tita, ro, epsilon):
+                img[i,j] = [128, 128, 128]
+
+
+def hough_transform(img, ro_steps=500, tita_steps=280, epsilon=1):
+    result = np.zeros_like(img)
+    acum = np.zeros((tita_steps, ro_steps))
+
+    tita2 = math.pi / 2
+    tita1 = -tita2
+    tita_step = (tita2 - tita1) / (tita_steps - 1)
+
+    ro2 = max(len(img), len(img[0])) * math.sqrt(2)
+    ro1 = -ro2
+    ro_step = (ro2 - ro1) / (ro_steps - 1)
+
+    current_tita = tita1
+    current_tita_step = 0
+
+    white_points = _find_white_points(img)
+
+    while current_tita_step < tita_steps:
+        current_ro = ro1
+        current_ro_step = 0
+
+        while current_ro_step < ro_steps:
+            for point in white_points:
+                if _satisfies_line_normal_equation(point[0], point[1], current_tita, current_ro, epsilon):
+                    acum[current_tita_step][current_ro_step] += 1
+
+            current_ro_step += 1
+            current_ro += ro_step
+
+        current_tita_step += 1
+        current_tita += tita_step
+
+    _max = np.max(acum)
+    thresh = .75 * _max
+
+    current_tita = tita1
+    current_tita_step = 0
+
+    while current_tita_step < tita_steps:
+        current_ro = ro1
+        current_ro_step = 0
+
+        while current_ro_step < ro_steps:
+            if (acum[current_tita_step][current_ro_step] > thresh):
+                _draw_line(result, current_tita, current_ro, epsilon)
+
+            current_ro_step += 1
+            current_ro += ro_step
+
+        current_tita_step += 1
+        current_tita += tita_step
+
+    return result
