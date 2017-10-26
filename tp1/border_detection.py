@@ -209,7 +209,7 @@ def susan(img):
         [0, 0, 1, 1, 1, 0, 0],
     ]
     t = 27
-    rounding_tolerance = .05
+    rounding_tolerance = .1
     to_border = int((len(mask) - 1) / 2)
     result = np.zeros_like(img)
     for i in range(to_border, len(img) - to_border):
@@ -219,12 +219,12 @@ def susan(img):
                 for x in range(-to_border, to_border + 1):
                     for y in range(-to_border, to_border + 1):
                         if mask[x + to_border][y + to_border] == 1:
-                            if abs(int(img[i,j,k])-img[i+x, j+y, k]) >= t:
+                            if abs(int(img[i,j,k])-int(img[i+x, j+y, k])) >= t:
                                 similar += 1
                 s = 1 - (similar / 37)
-                if s > .5-rounding_tolerance and s < .5+rounding_tolerance:
-                    result[i, j] = [255, 255, 255]
-                elif s > .75-rounding_tolerance and s < .75+rounding_tolerance:
+                # if .5-rounding_tolerance < s < .5+rounding_tolerance:
+                #     result[i, j] = [255, 255, 255]
+                if .75-rounding_tolerance < s < .75+rounding_tolerance:
                     result[i, j] = [0, 255, 0]
     return result
 

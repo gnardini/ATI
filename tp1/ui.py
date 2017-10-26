@@ -17,17 +17,20 @@ def to_tk_image(img):
 def from_tk_image(img):
     return
 
+def read_image_to(target_panel, path):
+    img_array = image_io.read(path)
+    img = to_tk_image(img_array)
+    target_panel.configure(image=img)
+    target_panel.image = img
+    return img_array
+
 def select_image(targetPanel):
     path = filedialog.askopenfilename()
     if len(path) > 0:
-        img_array = image_io.read(path)
-        img = to_tk_image(img_array)
-        targetPanel.configure(image=img)
-        targetPanel.image = img
+        return read_image_to(targetPanel, path)
     else:
         print('Invalid image')
         return np.zeros(0)
-    return img_array
 
 def assign_image(key):
     images[key] = select_image(panels[key])
@@ -79,6 +82,8 @@ btnB = Button(root, text="Elegir imagen", command=lambda: assign_image('original
 btnB.grid(row=base_row+3, column=0)
 panels['result-down'] = Label(root)
 panels['result-down'].grid(row=base_row+2, column=3, columnspan=3)
+
+images['original-up'] = read_image_to(panels['original-up'], './images/LENA.RAW')
 
 # Botones de transformacion
 parameter = Scale(root, from_=0, to=10, resolution=0.1, orient=HORIZONTAL)
