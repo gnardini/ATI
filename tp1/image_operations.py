@@ -225,8 +225,9 @@ def apply_weighted_median_filter(img):
                 result[i, j, k] = new_px[int((len(new_px)-1)/2)]
     return result
 
-def apply_gauss_filter(img, sigma=1):
-    size = 2*sigma+1
+def apply_gauss_filter(img, sigma=1, size=None):
+    if size == None:
+        size = 2*sigma+1
     filter = np.ones(size * size).reshape((size, size)) / (size * size)
     to_border = int((size - 1) / 2)
 

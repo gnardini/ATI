@@ -91,13 +91,12 @@ def _generate_contours(img, start, end):
     return contours, lin, lout
 
 # contours is mutated, lin and lout are not, new instances are returned
-def _adjust_contour(img, contours, lin, lout):
+def _adjust_contour(img, contours, lin, lout, out_change_fx, in_change_fx):
     change_made = False
-    [in_avg, out_avg] = _color_averages(img, contours)
     new_lout = []
     for out in lout:
         x, y = out
-        if _should_be_in(img[x, y], in_avg, out_avg):
+        if out_change_fx(x, y):
             change_made = True
             contours[x, y] = lin_value
             lin.append((x, y))
@@ -115,7 +114,7 @@ def _adjust_contour(img, contours, lin, lout):
         if _is_object_px(contours, x, y):
             contours[x, y] = object_value
         else:
-            if _should_be_in(img[x, y], in_avg, out_avg):
+            if in_change_fx(x, y):
                 new_lin.append(in_v)
             else:
                 change_made = True
@@ -137,7 +136,9 @@ def _adjust_contour(img, contours, lin, lout):
     lout = new_lout
     return lin, lout, change_made
 
-def active_contours(img, start=(200, 115), end=(250, 150)):
+def active_contours(img, rect=((200, 115), (250, 150))):
+    start = rect[0]
+    end = rect[1]
     [contours, lin, lout] = _generate_contours(img, start, end)
     max_cycles = min(len(img), len(img[0]))
     continue_ = True
@@ -145,7 +146,16 @@ def active_contours(img, start=(200, 115), end=(250, 150)):
     while cycles_done < max_cycles and continue_:
         print(cycles_done)
         cycles_done += 1
-        [lin, lout, continue_] = _adjust_contour(img, contours, lin, lout)
+        [in_avg, out_avg] = _color_averages(img, contours)
+        change_fx = lambda x, y: _should_be_in(img[x, y], in_avg, out_avg)
+        [lin, lout, continue_] = _adjust_contour(img, contours, lin, lout, change_fx, change_fx)
+
+    # ???
+    # gauss_filter = ops.apply_gauss_filter(contours, sigma=1, size=5)
+    # g_out_change_fx = lambda x, y: gauss_filter[x, y] * contours[x, y] < 0
+    # g_in_change_fx = lambda x, y: gauss_filter[x, y] * contours[x, y] > 0
+    # _adjust_contour(img, contours, lin, lout, g_out_change_fx, g_in_change_fx)
+
     for in_v in lin:
         i, j = in_v
         img[i, j] = [255, 0, 0]
