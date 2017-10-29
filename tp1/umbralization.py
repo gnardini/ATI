@@ -1,4 +1,5 @@
 import numpy as np
+import queue
 import math
 from tp1 import image_operations as ops
 from basics import transforms as tr
@@ -46,15 +47,18 @@ def otsu_threshold(img):
 
 def otsu(img):
     threshold = otsu_threshold(img)
-    print (threshold)
     return ops.apply_threshold(img, threshold)
 
-def _is_surrounded(img, i, j, k, t):
-    deltas = [ (1, 0), (-1, 0), (0, 1), (0, -1) ]
-    for delta in deltas:
-        if img[i+delta[0], j+delta[1],k] < t:
-            return False
-    return True
+def _set_px(img, i, j, value):
+    for k in range(3):
+        img[i, j, k] = value
+
+def _get_value(img, i, j):
+    if i < 0 or i >= len(img):
+        return -1
+    if j < 0 or j >= len(img[0]):
+        return -1
+    return img[i, j, 0]
 
 def hiteresis_umbralization(img):
     thresh = otsu_threshold(img)
@@ -65,17 +69,26 @@ def hiteresis_umbralization(img):
         t1 = thresh / 2
     if t2 > 255:
         t2 = thresh + (255-thresh)/2
-    result = np.zeros_like(img)
+    print(t1, t2)
+    points = queue.Queue()
     for i in range(1, len(img)-1):
         for j in range(1, len(img[0])-1):
-            for k in range(len(img[0, 0])):
-                if img[i,j,k] > t2:
-                    result[i,j,k] = 255
-                elif img[i,j,k] > t1:
-                    if _is_surrounded(img, i, j, k, t1):
-                        result[i, j, k] = 255
-                    else:
-                        result[i, j, k] = 0
-                else:
-                    result[i,j,k] = 0
-    return result
+            if img[i,j,0] > t2:
+                _set_px(img, i, j, 255)
+                points.put((i, j))
+            elif img[i,j,0] < t1:
+                _set_px(img, i, j, 0)
+    deltas = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+    while not points.empty():
+        point = points.get()
+        for delta in deltas:
+            i = point[0] + delta[0]
+            j = point[1] + delta[1]
+            if 0 < _get_value(img, i, j) < 255:
+                _set_px(img, i, j, 255)
+                points.put((i, j))
+    for i in range(0, len(img)):
+        for j in range(0, len(img[0])):
+            if 0 < img[i,j,0] < 255:
+                _set_px(img, i, j, 0)
+    return img

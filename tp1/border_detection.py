@@ -135,68 +135,62 @@ def laplace_gauss(img, sigma=1, threshold=128):
     img = tr.mapValues(result, np.min(result), np.max(result))
     return ops.apply_threshold(img, threshold)
 
-def _canny_detection(img):
-    result = np.zeros(img.shape)
-    angles = np.zeros(img.shape)
-    vertical = ops.apply_mask(img, np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]]))
-    horizontal = ops.apply_mask(img, np.array([[-1,0,1], [-2,0,2], [-1,0,1]]))
-    for i in range(0, len(img)):
-        for j in range(0, len(img[0])):
-            for k in range(len(img[0, 0])):
-                v = int(vertical[i, j, k])
-                h = int(horizontal[i, j, k])
-                result[i, j, k] = math.sqrt(math.pow(v, 2) + math.pow(h, 2))
-                angles[i, j, k] = ((math.atan2(v, h) + math.pi / 2) / 2) * 360. / math.pi
-                if angles[i, j, k] < 0:
-                    angles[i, j, k] += math.pi
-                if angles[i, j, k] < 22.5 or angles[i, j, k] > 157.5:
-                    angles[i, j, k] = 0
-                elif angles[i, j, k] < 67.5:
-                    angles[i, j, k] = 45
-                elif angles[i, j, k] < 112.5:
-                    angles[i, j, k] = 90
-                else:
-                    angles[i, j, k] = 135
-    return tr.mapValues(result, np.min(result), np.max(result)), angles
+def _calculate_angle(v, h):
+    if h == 0:
+        angle = 90
+    else:
+        angle = math.atan2(v, h) * 180. / math.pi
+    if angle < 0:
+        angle += 180
+    if angle < 22.5 or angle > 157.5:
+        return 0
+    elif angle < 67.5:
+        return 45
+    elif angle < 112.5:
+        return 90
+    else:
+        return 135
 
-def _non_max_supression(img, angles):
+def _canny_detection(img):
     deltas = {
         0: [(1, 0), (-1, 0)],
-        45: [(1, -1), (-1, 1)],
+        45: [(-1, -1), (1, 1)],
         90: [(0, 1), (0, -1)],
-        135: [(-1, -1), (1, 1)],
+        135: [(1, -1), (-1, 1)],
     }
-    result = np.zeros_like(img)
+    result = np.zeros(img.shape)
+    vertical = ops.apply_mask(img, np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]]))
+    horizontal = ops.apply_mask(img, np.array([[-1,0,1], [-2,0,2], [-1,0,1]]))
+    s = sobel(img)
     for i in range(1, len(img)-1):
         for j in range(1, len(img[0])-1):
             for k in range(len(img[0, 0])):
-                if img[i, j, k] != 0:
-                    result[i, j, k] = img[i, j, k]
-                    for delta in deltas[angles[i, j, k]]:
-                        if img[i+delta[0],j+delta[1],k] > img[i,j,k]:
-                            result[i,j,k] = 0
-    return result
+                h = int(vertical[i, j, k])
+                v = int(horizontal[i, j, k])
+                angle = _calculate_angle(v, h)
+                result[i, j, k] = s[i, j, k]
+                for delta in deltas[angle]:
+                    if s[i+delta[0],j+delta[1],k] > s[i,j,k]:
+                        result[i,j,k] = 0
+    return tr.mapValues(result, np.min(result), np.max(result))
 
-
-def canny_detector(img, sig1=1, sig2=3, sig3=10):
-    [g1, a1] = _canny_detection(ops.apply_gauss_filter(img, sig1))
-    g1 = _non_max_supression(g1, a1)
+def canny_detector(img, sig1=1, sig2=3):
+    g1 = _canny_detection(ops.apply_gauss_filter(img, sig1))
     g1 = umb.hiteresis_umbralization(g1)
-    [g2, a2] = _canny_detection(ops.apply_gauss_filter(img, sig2))
-    g2 = _non_max_supression(g2, a2)
-    g2 = umb.hiteresis_umbralization(g2)
-    # [g3, a3] = _canny_detection(ops.apply_gauss_filter(img, sig3))
-    # g3 = _non_max_supression(g3, a3)
-    # g3 = umb.hiteresis_umbralization(g3)
-    result = np.zeros_like(g1)
-    for i in range(0, len(img)):
-        for j in range(0, len(img[0])):
-            for k in range(len(img[0, 0])):
-                if g1[i,j,k] == 255 or g2[i,j,k] == 255:
-                    result[i,j,k] = 255
-                else:
-                    result[i, j, k] = 0
-    return result
+    return g1
+
+    # g2 = _canny_detection(ops.apply_gauss_filter(img, sig2))
+    # g2 = umb.hiteresis_umbralization(g2)
+
+    # result = np.zeros_like(g1)
+    # for i in range(0, len(img)):
+    #     for j in range(0, len(img[0])):
+    #         for k in range(len(img[0, 0])):
+    #             if g1[i,j,k] == 255 and g2[i,j,k] == 255:
+    #                 result[i,j,k] = 255
+    #             else:
+    #                 result[i, j, k] = 0
+    # return result
 
 def susan(img):
     mask = [
@@ -211,7 +205,7 @@ def susan(img):
     t = 27
     rounding_tolerance = .1
     to_border = int((len(mask) - 1) / 2)
-    result = np.zeros_like(img)
+    result = np.copy(img)
     for i in range(to_border, len(img) - to_border):
         for j in range(to_border, len(img[0]) - to_border):
             for k in range(len(img[0, 0])):
@@ -222,10 +216,10 @@ def susan(img):
                             if abs(int(img[i,j,k])-int(img[i+x, j+y, k])) >= t:
                                 similar += 1
                 s = 1 - (similar / 37)
-                # if .5-rounding_tolerance < s < .5+rounding_tolerance:
-                #     result[i, j] = [255, 255, 255]
-                if .75-rounding_tolerance < s < .75+rounding_tolerance:
+                if .5-rounding_tolerance < s < .5+rounding_tolerance:
                     result[i, j] = [0, 255, 0]
+                if .25-rounding_tolerance < s < .25+rounding_tolerance:
+                    result[i, j] = [255, 0, 0]
     return result
 
 def _find_white_points(img):
