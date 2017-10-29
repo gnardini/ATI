@@ -10,6 +10,7 @@ from tp1 import image_operations as ops
 from tp1 import border_detection as bd
 from tp1 import umbralization as umb
 from tp1 import diffusion as diff
+from tp1 import active_contours as ac
 
 def to_tk_image(img):
     return ImageTk.PhotoImage(Image.fromarray(img))
@@ -48,6 +49,7 @@ def put_into(key, img):
     panels[key].image = img
 
 root = Tk()
+buttons = Toplevel(root)
 
 panels = {
     'original-up': None,
@@ -63,32 +65,29 @@ images = {
 }
 
 # Imagenes y botones para agregarlas
-base_row = 9
-panels['original-up'] = Label(root)
+base_row = 0
+panels['original-up'] = Label(buttons)
 panels['original-up'].grid(row=base_row, column=0, columnspan=3)
-panels['result-up'] = Label(root)
+panels['result-up'] = Label(buttons)
 panels['result-up'].grid(row=base_row, column=3, columnspan=3)
-btnA = Button(root, text="Elegir imagen", command=lambda: assign_image('original-up'))
+btnA = Button(buttons, text="Elegir imagen", command=lambda: assign_image('original-up'))
 btnA.grid(row=base_row+1, column=0)
-btnA = Button(root, text="Mover abajo", command=lambda: put_into('original-down', images['original-up']))
+btnA = Button(buttons, text="Mover abajo", command=lambda: put_into('original-down', images['original-up']))
 btnA.grid(row=base_row+1, column=1)
-btnA = Button(root, text="Guardar imagen", command=lambda: save_image('result-up'))
+btnA = Button(buttons, text="Guardar imagen", command=lambda: save_image('result-up'))
 btnA.grid(row=base_row+1, column=3)
-btnA = Button(root, text="Mover a izquierda", command=lambda: put_into('original-up', images['result-up']))
+btnA = Button(buttons, text="Mover a izquierda", command=lambda: put_into('original-up', images['result-up']))
 btnA.grid(row=base_row+1, column=4)
-panels['original-down'] = Label(root)
+panels['original-down'] = Label(buttons)
 panels['original-down'].grid(row=base_row+2, column=0, columnspan=3)
-btnB = Button(root, text="Elegir imagen", command=lambda: assign_image('original-down'))
+btnB = Button(buttons, text="Elegir imagen", command=lambda: assign_image('original-down'))
 btnB.grid(row=base_row+3, column=0)
-panels['result-down'] = Label(root)
+panels['result-down'] = Label(buttons)
 panels['result-down'].grid(row=base_row+2, column=3, columnspan=3)
 
 images['original-up'] = read_image_to(panels['original-up'], './images/LENA.RAW')
 
 # Botones de transformacion
-parameter = Scale(root, from_=0, to=10, resolution=0.1, orient=HORIZONTAL)
-parameter.set(1)
-parameter.grid(row=2, column=1)
 
 btn = Button(root, text='Sumar', command=lambda: put_into('result-up', ops.add_images(images['original-up'], images['original-down'])))
 btn.grid(row=0, column=0)
@@ -119,6 +118,9 @@ btn.grid(row=1, column=4)
 gaussScale = Scale(root, from_=0, to=1, resolution=0.01, orient=HORIZONTAL)
 gaussScale.set(.2)
 gaussScale.grid(row=2, column=0)
+parameter = Scale(root, from_=0, to=10, resolution=0.1, orient=HORIZONTAL)
+parameter.set(1)
+parameter.grid(row=2, column=1)
 btn = Button(root, text='Gauss', command=lambda: put_into('result-up', ops.add_gaussian_noise(images['original-up'], gaussScale.get(), parameter.get())))
 btn.grid(row=2, column=2)
 btn = Button(root, text='Exponencial', command=lambda: put_into('result-up', ops.add_exponential_noise(images['original-up'], gaussScale.get(), parameter.get())))
@@ -180,11 +182,15 @@ btn.grid(row=7, column=3)
 funcSel = Scale(root, from_=1, to=2, orient=HORIZONTAL)
 funcSel.set(1)
 funcSel.grid(row=7, column=4)
-btn = Button(root, text='Canny', command=lambda: put_into('result-up', bd.canny_detector(images['original-up'])))
+btn = Label(root, text='TP3', font="Default 16 bold")
 btn.grid(row=8, column=0)
+btn = Button(root, text='Canny', command=lambda: put_into('result-up', bd.canny_detector(images['original-up'])))
+btn.grid(row=9, column=0)
 btn = Button(root, text='SUSAN', command=lambda: put_into('result-up', bd.susan(images['original-up'])))
-btn.grid(row=8, column=1)
+btn.grid(row=9, column=1)
 btn = Button(root, text='Hough', command=lambda: put_into('result-up', bd.hough_transform(images['original-up'])))
-btn.grid(row=8, column=2)
+btn.grid(row=9, column=2)
+btn = Button(root, text='Contornos activos', command=lambda: put_into('result-up', ac.active_contours(images['original-up'])))
+btn.grid(row=9, column=3)
 
 root.mainloop()
