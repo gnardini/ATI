@@ -10,6 +10,9 @@ lin_value = -1
 lout_value = 1
 deltas = [(1, 0), (-1, 0), (0, 1), (0, -1)]
 
+lin_color = [255, 255, 255]
+lout_color = [0, 255, 0]
+
 def _set_px(img, i, j, value):
     for k in range(3):
         img[i, j, k] = value
@@ -136,10 +139,21 @@ def _adjust_contour(img, contours, lin, lout, out_change_fx, in_change_fx):
     lout = new_lout
     return lin, lout, change_made
 
-def active_contours(img, rect=((200, 115), (250, 150))):
+def draw_contours(img, lin, lout):
+    for in_v in lin:
+        i, j = in_v
+        img[i, j] = lin_color
+    for out in lout:
+        i, j = out
+        img[i, j] = lout_color
+
+def active_contours_rect(img, rect=((200, 115), (250, 150))):
     start = rect[0]
     end = rect[1]
     [contours, lin, lout] = _generate_contours(img, start, end)
+    return active_contours(img, contours, lin, lout)
+
+def active_contours(img, contours, lin, lout):
     max_cycles = min(len(img), len(img[0]))
     continue_ = True
     cycles_done = 0
@@ -156,10 +170,5 @@ def active_contours(img, rect=((200, 115), (250, 150))):
     # g_in_change_fx = lambda x, y: gauss_filter[x, y] * contours[x, y] > 0
     # _adjust_contour(img, contours, lin, lout, g_out_change_fx, g_in_change_fx)
 
-    for in_v in lin:
-        i, j = in_v
-        img[i, j] = [255, 0, 0]
-    for out in lout:
-        i, j = out
-        img[i, j] = [0, 0, 255]
-    return img
+    draw_contours(img, lin, lout)
+    return img, contours, lin, lout
