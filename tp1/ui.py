@@ -69,6 +69,8 @@ manager.set_panel('original-down', Label(buttons))
 manager.get_panel('original-down').grid(row=base_row+2, column=0, columnspan=3)
 btnB = Button(buttons, text="Elegir imagen", command=lambda: assign_image('original-down'))
 btnB.grid(row=base_row+3, column=0)
+btn = Button(buttons, text="Mover arriba", command=lambda: put_into('original-up', manager.get_image('original-down')))
+btn.grid(row=base_row+3, column=1)
 manager.set_panel('result-down', Label(buttons))
 manager.get_panel('result-down').grid(row=base_row+2, column=3, columnspan=3)
 
