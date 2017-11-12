@@ -11,6 +11,8 @@ from tp1 import diffusion as diff
 from tp1 import active_contours as ac
 from tp1 import motion_handler as mh
 from tp1 import image_management as im
+from tp1 import characteristics_points as cp
+from basics import basic_operations as bo
 
 def from_tk_image(img):
     return
@@ -74,7 +76,7 @@ btn.grid(row=base_row+3, column=1)
 manager.set_panel('result-down', Label(buttons))
 manager.get_panel('result-down').grid(row=base_row+2, column=3, columnspan=3)
 
-manager.set_image('original-up', read_image_to(manager.get_panel('original-up'), './images/LENA.RAW'))
+manager.set_image('original-up', read_image_to(manager.get_panel('original-up'), '../images/LENA.RAW'))
 
 # Botones de transformacion
 
@@ -188,6 +190,19 @@ btn = Button(root, text='Contornos activos', command=active_contours)
 btn.grid(row=9, column=3)
 btn = Button(root, text='Seleccionar region', command=start_choose_region)
 btn.grid(row=9, column=4)
+
+btn = Label(root, text='TP4', font="Default 16 bold")
+btn.grid(row=10, column=0)
+btn = Button(root, text='Harris', command=lambda: put_into('result-up', cp.harris(manager.get_image('original-up'))))
+btn.grid(row=11, column=0)
+btn = Button(root, text='Perspective', command=lambda: put_into('result-up', bo.perspective(manager.get_image('original-up'))))
+btn.grid(row=11, column=1)
+btn = Button(root, text='Scale', command=lambda: put_into('result-up', bo.scale(manager.get_image('original-up'))))
+btn.grid(row=11, column=2)
+btn = Button(root, text='Rotate', command=lambda: put_into('result-up', bo.rotate(manager.get_image('original-up'))))
+btn.grid(row=11, column=3)
+btn = Button(root, text='Translate', command=lambda: put_into('result-up', bo.translate(manager.get_image('original-up'))))
+btn.grid(row=11, column=4)
 
 
 root.mainloop()
