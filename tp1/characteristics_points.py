@@ -1,23 +1,29 @@
 import numpy as np
+import cv2
 import math
 from tp1 import image_operations as ops
 from tp1 import umbralization as umb
 from basics import transforms as tr
 from tp1 import border_detection as bd
 
-def harris(img):
-    porcentage = 0.05
-    k = 0.04
+def harris(img, threshold = 0, percentage = 0.05, k = 0.04):
+    gs_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gs_img_3 = np.zeros_like(img)
+    gs_img_3[:,:,0] = gs_img
+    gs_img_3[:,:,1] = gs_img
+    gs_img_3[:,:,2] = gs_img
+
     ## Apply prewitt masks
-    vertical_mask = np.array([[-1, -2, -1], [0, 0, 0], [1, 2, 1]])
-    horizontal_mask = np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]])
-    vertical = ops.apply_mask(img, vertical_mask)
-    horizontal = ops.apply_mask(img, horizontal_mask)
+    vertical_mask = np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]])
+    horizontal_mask = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+    vertical = ops.apply_mask(gs_img_3, vertical_mask)
+    horizontal = ops.apply_mask(gs_img_3, horizontal_mask)
+
     ## Calculate components from masks
     vertical_2 = vertical * vertical
-
     horizontal_2 = horizontal * horizontal
     vertical_horizontal = vertical * vertical
+
     ## Apply Gauss filter
     vertical_2 = ops.apply_gauss_filter(vertical_2, 2)
     horizontal_2 = ops.apply_gauss_filter(horizontal_2, 2)
@@ -29,12 +35,29 @@ def harris(img):
     cim =(horizontal_2 * vertical_2 - part1 - (part2 * part2) * k)
     maxCim = cim.max();
 
-    #Add result to original image
+    if threshold == 0:
+        threshold = maxCim*percentage
+
+    print("Threshold: %d"%(threshold))
+    # Add result to original image
     result = np.copy(img)
     for i in range(len(result)):
         for j in range(len(result[i])):
-            if (cim[i,j,0] > porcentage*maxCim) or (cim[i,j,1]> porcentage*maxCim) or (cim[i,j,2]> porcentage*maxCim):
-                result[i,j,0] = 255
+            # 100000000
+            if (cim[i,j,0] > threshold):
+                result[i,j,0] = 0
                 result[i,j,1] = 0
-                result[i,j,2] = 0
+                result[i,j,2] = 255
     return result
+
+
+# Para sift. Contar cantidad de descriptores en la imagen original, la cantidad de descriptores en la imagen a comparar
+# Armar relación entre descriptores y coincidencias. (contar las coincidencias de descriptores)
+# Después de borronear tanto lo que queda es realmente característico de la imagen
+# Octavas
+
+# Los frameworks suele determinar cuántos sigmas se usan.
+# Curvatura principales de una superficie es ??
+#   Curvatura principal -> lambda 1 * lambda2 / (lambda 1 + lambda2)
+#   Deja el análisis de harris dependiente del radio de curvatura
+#   Hay que verificar si el ru = 10 está bien, se fija que los autovalores no sean 10 veces más grandes
