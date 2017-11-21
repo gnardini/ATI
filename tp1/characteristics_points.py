@@ -65,6 +65,7 @@ def sift_comparison(img1, img2, percentage=0.75):
     result2 = cv2.drawKeypoints(gray,kp2,img2)
 
     # Match descriptors.
+    # bf doc: https://docs.opencv.org/trunk/d3/da1/classcv_1_1BFMatcher.html
     matches = bf.match(des1, des2)
     if (len(matches) >= percentage * len(des1)) || (len(matches) >= percentage * len(des2)):
         print('Match')
