@@ -50,7 +50,28 @@ def harris(img, threshold = 0, percentage = 0.05, k = 0.04):
                 result[i,j,2] = 255
     return result
 
+def sift_comparison(img1, img2, percentage=0.75):
+    # create BFMatcher object
+    bf = cv2.BFMatcher(crossCheck=True)
 
+    gray = cv2.cvtColor(img1,cv2.COLOR_BGR2GRAY)
+    sift = cv2.xfeatures2d.SIFT_create()
+    kp1, des1 = sift.detectAndCompute(gray,None)
+    result1 = cv2.drawKeypoints(gray,kp1,img1)
+
+    gray = cv2.cvtColor(img2,cv2.COLOR_BGR2GRAY)
+    sift = cv2.xfeatures2d.SIFT_create()
+    kp2, des2 = sift.detectAndCompute(gray,None)
+    result2 = cv2.drawKeypoints(gray,kp2,img2)
+
+    # Match descriptors.
+    matches = bf.match(des1, des2)
+    if (len(matches) >= percentage * len(des1)) || (len(matches) >= percentage * len(des2)):
+        print('Match')
+    else:
+        print('Not match')
+
+    return [result1, result2]
 # Para sift. Contar cantidad de descriptores en la imagen original, la cantidad de descriptores en la imagen a comparar
 # Armar relación entre descriptores y coincidencias. (contar las coincidencias de descriptores)
 # Después de borronear tanto lo que queda es realmente característico de la imagen

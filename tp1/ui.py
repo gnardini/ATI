@@ -44,6 +44,11 @@ def save_image(key):
 def put_into(key, img):
     manager.put_into(key, img)
 
+## FIX THIS :@
+def put_into_a(keys, imgs):
+    manager.put_into(keys[0], imgs[0])
+    manager.put_into(keys[1], imgs[1])
+
 def start_choose_region():
     motion_handler.start()
 
@@ -212,6 +217,9 @@ btn = Button(root, text='Rotate', command=lambda: put_into('result-up', bo.rotat
 btn.grid(row=12, column=3)
 btn = Button(root, text='Translate', command=lambda: put_into('result-up', bo.translate(manager.get_image('original-up'))))
 btn.grid(row=12, column=0)
-
-
+btn = Button(root, text='SIFT', command=lambda: put_into_a(['result-up', 'result-down'], cp.sift_comparison(manager.get_image('original-up'), manager.get_image('original-down'), siftPercentage.get())))
+btn.grid(row=13, column=0)
+siftPercentage = Scale(root, from_=0, to=1, resolution=0.05, orient=HORIZONTAL)
+siftPercentage.set(0.75)
+siftPercentage.grid(row=13, column=1)
 root.mainloop()
