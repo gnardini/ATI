@@ -153,12 +153,13 @@ def active_contours_rect(img, rect=((200, 115), (250, 150))):
     [contours, lin, lout] = _generate_contours(img, start, end)
     return active_contours(img, contours, lin, lout)
 
-def active_contours(img, contours, lin, lout):
-    max_cycles = min(len(img), len(img[0]))
+def active_contours(img, contours, lin, lout, max_cycles=None):
+    if max_cycles is None:
+        max_cycles = min(len(img), len(img[0]))
     continue_ = True
     cycles_done = 0
     while cycles_done < max_cycles and continue_:
-        print(cycles_done)
+        # print(cycles_done)
         cycles_done += 1
         [in_avg, out_avg] = _color_averages(img, contours)
         change_fx = lambda x, y: _should_be_in(img[x, y], in_avg, out_avg)

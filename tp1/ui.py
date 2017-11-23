@@ -184,6 +184,12 @@ btn = Button(root, text='Canny', command=lambda: put_into('result-up', bd.canny_
 btn.grid(row=9, column=0)
 btn = Button(root, text='SUSAN', command=lambda: put_into('result-up', bd.susan(manager.get_image('original-up'))))
 btn.grid(row=9, column=1)
+# roS = Scale(root, from_=1, to=300, orient=HORIZONTAL)
+# roS.set(256)
+# roS.grid(row=9, column=2)
+# titaS = Scale(root, from_=1, to=360, orient=HORIZONTAL)
+# titaS.set(5)
+# titaS.grid(row=9, column=3)
 btn = Button(root, text='Hough', command=lambda: put_into('result-up', bd.hough_transform(manager.get_image('original-up'))))
 btn.grid(row=9, column=2)
 def active_contours():

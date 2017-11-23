@@ -240,7 +240,7 @@ def _draw_line(img, tita, ro, epsilon):
                 img[i,j] = [128, 128, 128]
 
 
-def hough_transform(img, ro_steps=500, tita_steps=360, epsilon=1):
+def hough_transform(img, ro_steps=256, tita_steps=5, epsilon=1):
     result = np.zeros_like(img)
     acum = np.zeros((tita_steps, ro_steps))
 
@@ -255,8 +255,8 @@ def hough_transform(img, ro_steps=500, tita_steps=360, epsilon=1):
     current_tita = tita1
     current_tita_step = 0
 
-    newImg = umb.global_thresholding(prewitt(img))
-    white_points = _find_white_points(newImg)
+    img = canny_detector(img)
+    white_points = _find_white_points(img)
 
     while current_tita_step < tita_steps:
         current_ro = ro1
@@ -274,7 +274,7 @@ def hough_transform(img, ro_steps=500, tita_steps=360, epsilon=1):
         current_tita += tita_step
 
     _max = np.max(acum)
-    thresh = .75 * _max
+    thresh = .5 * _max
 
     current_tita = tita1
     current_tita_step = 0
