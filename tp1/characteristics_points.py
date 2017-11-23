@@ -22,7 +22,7 @@ def harris(img, threshold = 0, percentage = 0.05, k = 0.04):
     ## Calculate components from masks
     vertical_2 = vertical * vertical
     horizontal_2 = horizontal * horizontal
-    vertical_horizontal = vertical * vertical
+    vertical_horizontal = vertical * horizontal
 
     ## Apply Gauss filter
     vertical_2 = ops.apply_gauss_filter(vertical_2, 2)
@@ -33,7 +33,7 @@ def harris(img, threshold = 0, percentage = 0.05, k = 0.04):
     part2 = vertical_2 + horizontal_2
 
     cim =(horizontal_2 * vertical_2 - part1 - (part2 * part2) * k)
-    maxCim = cim.max();
+    maxCim = cim.max()
 
     if threshold == 0:
         threshold = maxCim*percentage
@@ -67,7 +67,7 @@ def sift_comparison(img1, img2, percentage=0.75):
     # Match descriptors.
     # bf doc: https://docs.opencv.org/trunk/d3/da1/classcv_1_1BFMatcher.html
     matches = bf.match(des1, des2)
-    if (len(matches) >= percentage * len(des1)) || (len(matches) >= percentage * len(des2)):
+    if (len(matches) >= percentage * len(des1)) or (len(matches) >= percentage * len(des2)):
         print('Match')
     else:
         print('Not match')

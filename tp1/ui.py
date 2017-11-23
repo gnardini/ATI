@@ -81,7 +81,7 @@ btn.grid(row=base_row+3, column=1)
 manager.set_panel('result-down', Label(buttons))
 manager.get_panel('result-down').grid(row=base_row+2, column=3, columnspan=3)
 
-manager.set_image('original-up', read_image_to(manager.get_panel('original-up'), '../images/LENA.RAW'))
+manager.set_image('original-up', read_image_to(manager.get_panel('original-up'), './images/LENA.RAW'))
 
 # Botones de transformacion
 
@@ -202,6 +202,7 @@ btn.grid(row=9, column=3)
 btn = Button(root, text='Seleccionar region', command=start_choose_region)
 btn.grid(row=9, column=4)
 
+#TP4
 btn = Label(root, text='TP4', font="Default 16 bold")
 btn.grid(row=10, column=0)
 btn = Button(root, text='Harris', command=lambda: put_into('result-up', cp.harris(manager.get_image('original-up'), harrisThreshold.get(), harrisPercentage.get(), harrisK.get())))

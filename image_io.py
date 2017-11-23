@@ -15,7 +15,8 @@ def read(file_path, grayscale=False):
     if file_name in sizes:
         return _read_raw(file_path, sizes[file_name][0], sizes[file_name][1])
     else:
-        return cv2.imread(file_path)
+        img = cv2.imread(file_path)
+        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 def _read_raw(file, width, height):
     image = np.zeros((height, width, 3), np.uint8)
@@ -35,4 +36,5 @@ def _read_img(file, grayscale):
         return img
 
 def save_image(image, path):
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     cv2.imwrite(path, image)

@@ -17,7 +17,7 @@ def translate(img, x=100, y=20):
 
 def perspective(img):
     rows,cols,c = img.shape
-    pts1 = np.float32([[10,0],[60,30],[28,50],[90,20]])
+    pts1 = np.float32([[.2*rows,0],[.8*rows,.1*cols],[.3*rows,.9*cols],[.8*rows,.9*cols]])
     pts2 = np.float32([[0,0],[rows,0],[0,cols],[rows,cols]])
     M = cv2.getPerspectiveTransform(pts1,pts2)
     return cv2.warpPerspective(img,M,(cols,rows))
